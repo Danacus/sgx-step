@@ -17,6 +17,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with SGX-Step. If not, see <http://www.gnu.org/licenses/>.
  */
+#include <stdint.h>
 #if !NO_SGX
 
 #include "enclave.h"
@@ -193,6 +194,13 @@ void* get_enclave_ssa_gprsgx_adrs(void)
     edbgrd(tcs_addr + SGX_TCS_CSSA_OFFSET, &cssa, sizeof(cssa));
 
     return get_enclave_base() + ossa + (cssa * SGX_SSAFRAMESIZE) - SGX_GPRSGX_SIZE;
+}
+
+void set_debug_optin(void) 
+{
+    void *tcs_addr = sgx_get_tcs();
+    uint64_t flags = 0x1;
+    edbgwr(tcs_addr + 8, &flags, sizeof(flags));
 }
 
 void print_enclave_info(void)
