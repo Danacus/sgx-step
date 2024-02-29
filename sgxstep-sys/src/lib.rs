@@ -9,14 +9,19 @@ include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 #[inline]
 pub fn enable_tf() {
     unsafe {
-        asm!("pushf", "orl $0x100, (%rsp)", "popf");
+        asm!("pushf", "orl $0x100, (%rsp)", "popf", options(att_syntax));
     }
 }
 
 #[inline]
 pub fn disable_tf() {
     unsafe {
-        asm!("pushf", "andl $0xfffffeff, (%rsp)", "popf");
+        asm!(
+            "pushf",
+            "andl $0xfffffeff, (%rsp)",
+            "popf",
+            options(att_syntax)
+        );
     }
 }
 
@@ -34,9 +39,10 @@ pub unsafe fn apic_write(reg: u32, v: u32) {
     let addr = (apic_base as usize + reg as usize) as *mut u32;
 
     asm!(
-        "movl {1:r}, ({0})",
+        "movl {1:e}, ({0})",
         in(reg) addr,
         in(reg) v,
+        options(att_syntax)
     );
 }
 
@@ -84,6 +90,7 @@ pub fn reload(address: *const u8) -> u64 {
             out("ax") time,
             out("si") _,
             out("dx") _,
+            options(att_syntax)
         );
     }
 
@@ -99,6 +106,7 @@ pub fn flush(p: *const u8) {
             "mfence",
             in(reg) p,
             out("ax") _,
+            options(att_syntax)
         );
     }
 }
@@ -110,6 +118,7 @@ pub fn maccess(p: *const u8) {
             "mov ({}), %rax",
             in(reg) p,
             out("ax") _,
+            options(att_syntax)
         );
     }
 }
